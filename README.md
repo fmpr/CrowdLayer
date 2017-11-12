@@ -90,7 +90,7 @@ See the corresponding jupyter notebooks available on the repository.
 
 # Datasets
 
-Datasets used in all the experiments from the demos are available [here](http://www.fprodrigues.com/publications/deep-crowds/).
+The datasets used in all the experiments from the demos are available [here](http://www.fprodrigues.com/publications/deep-crowds/).
 
 
 
