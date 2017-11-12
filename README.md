@@ -81,8 +81,8 @@ loss = MaskedMultiSequenceCrossEntropy(N_CLASSES).loss
 
 For demonstration purposes, we provide 4 practical applications of the crowd layer in the following problems:
 
-* Image classification using simulated annotators on the [Cats vs Dogs dataset](https://www.kaggle.com/c/dogs-vs-cats);
-* Image classification using real annotators from Amazon Mechanical Turk on [LabelMe data](http://labelme.csail.mit.edu/Release3.0/browserTools/php/dataset.php);
+* Image classification (binary) using simulated annotators on the [Cats vs Dogs dataset](https://www.kaggle.com/c/dogs-vs-cats);
+* Image classification (multi-class) using real annotators from Amazon Mechanical Turk on [LabelMe data](http://labelme.csail.mit.edu/Release3.0/browserTools/php/dataset.php);
 * Text regression using real annotators from Amazon Mechanical Turk on the [MovieReviews dataset](http://www.cs.cornell.edu/people/pabo/movie-review-data/);
 * Sequence labelling using real annotators from Amazon Mechanical Turk on the [2003 CONLL Named Entity Recognition (NER) dataset](https://cogcomp.org/page/resource_view/81).
 
