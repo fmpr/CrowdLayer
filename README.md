@@ -9,7 +9,7 @@ This implementation is based on Keras and Tensorflow.
 
 ## Classification
 
-Using the crowd layer in your own Keras deep neural networks for classification problems is very simple. For example, you have a sequential model, you just need to add a "CrowdsClassification" layer as the last layer of the model (on top of what would normally be your output layer, e.g. "Dense" with softmax activation) and use a specialized cross-entropy loss to handle missing answers: 
+Using the crowd layer in your own Keras deep neural networks for classification problems is very simple. For example, given a sequential model in Keras, you just need to add a "CrowdsClassification" layer as the last layer of the model (on top of what would normally be your output layer, e.g. "Dense" with softmax activation) and use a specialized cross-entropy loss to handle missing answers (encoded with "-1"): 
 
 ```python
 # build your own base model for classification
