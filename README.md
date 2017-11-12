@@ -86,7 +86,11 @@ For demonstration purposes, we provide 4 practical applications of the crowd lay
 * Text regression using real annotators from Amazon Mechanical Turk on the [MovieReviews dataset](http://www.cs.cornell.edu/people/pabo/movie-review-data/);
 * Sequence labelling using real annotators from Amazon Mechanical Turk on the [2003 CONLL Named Entity Recognition (NER) dataset](https://cogcomp.org/page/resource_view/81).
 
-See the corresponding jupyter notebooks available on the repository.
+See the corresponding jupyter notebooks available on the repository. 
+
+# Datasets
+
+Datasets used in all the experiments from the demos are available [here](http://www.fprodrigues.com/publications/deep-crowds/).
 
 
 
