@@ -1,14 +1,15 @@
 
 import numpy as np
 import tensorflow as tf
-import keras
-from keras import backend as K
-from keras.engine.topology import Layer
+import tensorflow.keras as keras
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Layer
+#from tensorflow.keras.engine.topology import Layer
 
 def init_identities(shape, dtype=None):
 	out = np.zeros(shape)
-	for r in xrange(shape[2]):
-		for i in xrange(shape[0]):
+	for r in range(shape[2]):
+		for i in range(shape[0]):
 			out[i,i,r] = 1.0
 	return out
 	
@@ -188,7 +189,7 @@ class CrowdsAggregationCategoricalCrossEntropy(object):
 		
 		# initialize pi_est (annotators' estimated confusion matrices) wit identities
 		self.pi_est = np.zeros((self.num_classes,self.num_classes,self.num_annotators), dtype=np.float32)
-		for r in xrange(self.num_annotators):
+		for r in range(self.num_annotators):
 			self.pi_est[:,:,r] = np.eye(self.num_classes) + self.pi_prior
 			self.pi_est[:,:,r] /= np.sum(self.pi_est[:,:,r], axis=1)
 			
@@ -216,7 +217,7 @@ class CrowdsAggregationCategoricalCrossEntropy(object):
 
 		# E-step
 		adjustment_factor = tf.ones_like(y_pred)
-		for r in xrange(self.num_annotators):
+		for r in range(self.num_annotators):
 			adj = tf.where(tf.equal(y_true[:,r], -1), 
 								tf.ones_like(y_pred), 
 								tf.gather(tf.transpose(self.pi_est[:,:,r]), y_true[:,r]))
@@ -229,11 +230,11 @@ class CrowdsAggregationCategoricalCrossEntropy(object):
 		
 		# update suff stats
 		upd_suff_stats = []
-		for r in xrange(self.num_annotators):
+		for r in range(self.num_annotators):
 			#print r
 			suff_stats = []
 			normalizer = tf.zeros_like(y_pred)
-			for c in xrange(self.num_classes):
+			for c in range(self.num_classes):
 				suff_stats.append(tf.reduce_sum(tf.where(tf.equal(y_true[:,r], c), 
 									y_agg,
 									tf.zeros_like(y_pred)), axis=0))
@@ -261,16 +262,16 @@ class CrowdsAggregationBinaryCrossEntropy(object):
 		
 		# initialize alpha and beta (annotators' estimated sensitivity and specificity)
 		if self.alpha == None:
-			print "initializing alpha with unit..."
+			print("initializing alpha with unit...")
 			self.alpha = 0.99*np.ones((self.num_annotators,1), dtype=np.float32)
 		if self.beta == None:
 			self.beta = 0.99*np.ones((self.num_annotators,1), dtype=np.float32)
 		self.count = tf.ones(1)
 			
-		self.suff_stats_alpha = [self.pi_prior for r in xrange(self.num_annotators)]
-		self.suff_stats_beta = [self.pi_prior for r in xrange(self.num_annotators)]
-		self.suff_stats_alpha_norm = [self.pi_prior for r in xrange(self.num_annotators)]
-		self.suff_stats_beta_norm = [self.pi_prior for r in xrange(self.num_annotators)]
+		self.suff_stats_alpha = [self.pi_prior for r in range(self.num_annotators)]
+		self.suff_stats_beta = [self.pi_prior for r in range(self.num_annotators)]
+		self.suff_stats_alpha_norm = [self.pi_prior for r in range(self.num_annotators)]
+		self.suff_stats_beta_norm = [self.pi_prior for r in range(self.num_annotators)]
 			
 	def init_suff_stats(self):
 		# initialize suff stats for M-step
@@ -297,24 +298,24 @@ class CrowdsAggregationBinaryCrossEntropy(object):
 		#self.count += 1
 
 		if False:
-			print "M-step..."
+			print("M-step...")
 			self.alpha = []
 			self.beta = []
-			for r in xrange(self.num_annotators):
+			for r in range(self.num_annotators):
 				self.alpha.append(self.suff_stats_alpha[r] / self.suff_stats_alpha_norm[r])
 				self.beta.append(self.suff_stats_beta[r] / self.suff_stats_beta_norm[r])
 			self.count = 0
-			self.suff_stats_alpha = [self.pi_prior for r in xrange(self.num_annotators)]
-			self.suff_stats_beta = [self.pi_prior for r in xrange(self.num_annotators)]
-			self.suff_stats_alpha_norm = [self.pi_prior for r in xrange(self.num_annotators)]
-			self.suff_stats_beta_norm = [self.pi_prior for r in xrange(self.num_annotators)]
+			self.suff_stats_alpha = [self.pi_prior for r in range(self.num_annotators)]
+			self.suff_stats_beta = [self.pi_prior for r in range(self.num_annotators)]
+			self.suff_stats_alpha_norm = [self.pi_prior for r in range(self.num_annotators)]
+			self.suff_stats_beta_norm = [self.pi_prior for r in range(self.num_annotators)]
 			self.alpha = tf.Print(self.alpha, [self.alpha])
 
 		
 		# E-step
 		a = tf.ones_like(p)
 		b = tf.ones_like(p)
-		for r in xrange(self.num_annotators):
+		for r in range(self.num_annotators):
 			a = a * tf.where(tf.equal(y_true[:,r], 1), self.alpha[r]*tf.ones_like(p), tf.ones_like(p))
 			b = b * tf.where(tf.equal(y_true[:,r], 1), (1.0-self.beta[r])*tf.ones_like(p), tf.ones_like(p))
 			a = a * tf.where(tf.equal(y_true[:,r], 0), (1.0-self.alpha[r])*tf.ones_like(p), tf.ones_like(p))
@@ -325,7 +326,7 @@ class CrowdsAggregationBinaryCrossEntropy(object):
 		loss = - (mu * tf.log(y_pred[:,1]) + (1.0-mu) * tf.log(y_pred[:,0]))
 
 		# update suff stats
-		for r in xrange(self.num_annotators):
+		for r in range(self.num_annotators):
 			self.suff_stats_alpha[r] += tf.reduce_sum(tf.where(tf.equal(y_true[:,r], 1), mu, tf.zeros_like(p)))
 			self.suff_stats_beta[r] += tf.reduce_sum(tf.where(tf.equal(y_true[:,r], 0), (1.0-mu), tf.zeros_like(p)))
 			self.suff_stats_alpha_norm[r] += tf.reduce_sum(tf.where(tf.equal(y_true[:,r], -1), tf.zeros_like(p), mu))
@@ -334,8 +335,8 @@ class CrowdsAggregationBinaryCrossEntropy(object):
 		return loss
 	
 	def m_step(self):
-		print dir(self)
-		print "debug:", self.count.eval()
+		print((dir(self)))
+		print(("debug:", self.count.eval()))
 		#print "M-step"
 		#self.count += 1
 		#print "increment", self.count
