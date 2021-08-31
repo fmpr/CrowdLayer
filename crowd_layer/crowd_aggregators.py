@@ -19,20 +19,20 @@ class CrowdsBinaryAggregator():
 
 		# initialize estimated ground truth with majority voting
 		self.ground_truth_est = np.zeros((self.n_train, 2))
-		for i in xrange(self.n_train):
+		for i in range(self.n_train):
 			votes = np.zeros(self.num_annotators)
-			for r in xrange(self.num_annotators):
+			for r in range(self.num_annotators):
 				if answers[i,r] != -1:
 					votes[answers[i,r]] += 1
 			self.ground_truth_est[i,np.argmax(votes)] = 1
 
 
 	def e_step(self):
-		print "E-step"
-		for i in xrange(self.n_train):
+		print("E-step")
+		for i in range(self.n_train):
 			a = 1.0
 			b = 1.0
-			for r in xrange(self.num_annotators):
+			for r in range(self.num_annotators):
 				if self.answers[i,r] != -1:
 					if self.answers[i,r] == 1:
 						a *= self.alpha[r]
@@ -50,17 +50,17 @@ class CrowdsBinaryAggregator():
 
 
 	def m_step(self, epochs=1):
-		print "M-step"
+		print("M-step")
 		hist = self.model.fit(self.data_train, self.ground_truth_est, epochs=epochs, shuffle=True, batch_size=self.batch_size, verbose=0) 
-		print "loss:", hist.history["loss"][-1]
+		print(("loss:", hist.history["loss"][-1]))
 		self.ground_truth_est = self.model.predict(self.data_train)
 
 		self.alpha = self.alpha_prior*np.ones(self.num_annotators)
 		self.beta = self.beta_prior*np.ones(self.num_annotators)
-		for r in xrange(self.num_annotators):
+		for r in range(self.num_annotators):
 			alpha_norm = 0.0
 			beta_norm = 0.0
-			for i in xrange(self.n_train):
+			for i in range(self.n_train):
 				if self.answers[i,r] != -1:
 					alpha_norm += self.ground_truth_est[i,1]
 					beta_norm += self.ground_truth_est[i,0]
@@ -93,19 +93,19 @@ class CrowdsCategoricalAggregator():
 
 		# initialize estimated ground truth with majority voting
 		self.ground_truth_est = np.zeros((self.n_train, self.num_classes))
-		for i in xrange(self.n_train):
+		for i in range(self.n_train):
 			votes = np.zeros(self.num_annotators)
-			for r in xrange(self.num_annotators):
+			for r in range(self.num_annotators):
 				if answers[i,r] != -1:
 					votes[answers[i,r]] += 1
 			self.ground_truth_est[i,np.argmax(votes)] = 1.0
 
 
 	def e_step(self):
-		print "E-step"
-		for i in xrange(self.n_train):
+		print("E-step")
+		for i in range(self.n_train):
 			adjustment_factor = np.ones(self.num_classes)
-			for r in xrange(self.num_annotators):
+			for r in range(self.num_annotators):
 				if self.answers[i,r] != -1:
 					adjustment_factor *= self.pi[:,self.answers[i,r],r]
 			self.ground_truth_est[i,:] = np.transpose(adjustment_factor) * self.ground_truth_est[i,:]
@@ -114,15 +114,15 @@ class CrowdsCategoricalAggregator():
 
 
 	def m_step(self,):
-		print "M-step"
+		print("M-step")
 		hist = self.model.fit(self.data_train, self.ground_truth_est, epochs=1, shuffle=True, batch_size=self.batch_size, verbose=0) 
-		print "loss:", hist.history["loss"][-1]
+		print(("loss:", hist.history["loss"][-1]))
 		self.ground_truth_est = self.model.predict(self.data_train)
 
 		self.pi = self.pi_prior * np.ones((self.num_classes,self.num_classes,self.num_annotators))
-		for r in xrange(self.num_annotators):
+		for r in range(self.num_annotators):
 			normalizer = np.zeros(self.num_classes)
-			for i in xrange(self.n_train):
+			for i in range(self.n_train):
 				if self.answers[i,r] != -1:
 					self.pi[:,self.answers[i,r],r] += np.transpose(self.ground_truth_est[i,:])
 					normalizer += self.ground_truth_est[i,:]
@@ -144,30 +144,30 @@ class CrowdsSequenceAggregator():
                 self.seq_length = answers.shape[1]
                 self.num_classes = np.max(answers) + 1
                 self.num_annotators = answers.shape[2]
-                print "n_train:", self.n_train
-                print "seq_length:", self.seq_length
-                print "num_annotators:", self.num_annotators
+                print(("n_train:", self.n_train))
+                print(("seq_length:", self.seq_length))
+                print(("num_annotators:", self.num_annotators))
 
                 # initialize annotators as reliable (almost perfect)
                 self.pi = self.pi_prior * np.ones((self.num_classes,self.num_classes,self.num_annotators))
 
                 # initialize estimated ground truth with majority voting
                 self.ground_truth_est = np.zeros((self.n_train, self.seq_length, self.num_classes))
-                for i in xrange(self.n_train):
-                        for j in xrange(self.seq_length):
+                for i in range(self.n_train):
+                        for j in range(self.seq_length):
                                 votes = np.zeros(self.num_annotators)
-                                for r in xrange(self.num_annotators):
+                                for r in range(self.num_annotators):
                                         if answers[i,j,r] != -1:
                                                 votes[answers[i,j,r]] += 1
                                 self.ground_truth_est[i,j,np.argmax(votes)] = 1.0
 
 
         def e_step(self):
-                print "E-step"
-                for i in xrange(self.n_train):
-                        for j in xrange(self.seq_length):
+                print("E-step")
+                for i in range(self.n_train):
+                        for j in range(self.seq_length):
                                 adjustment_factor = np.ones(self.num_classes)
-                                for r in xrange(self.num_annotators):
+                                for r in range(self.num_annotators):
                                         if self.answers[i,j,r] != -1:
                                                 adjustment_factor *= self.pi[:,self.answers[i,j,r],r]
                                 self.ground_truth_est[i,j,:] = np.transpose(adjustment_factor) * self.ground_truth_est[i,j,:]
@@ -176,16 +176,16 @@ class CrowdsSequenceAggregator():
 
 
         def m_step(self,epochs):
-                print "M-step"
+                print("M-step")
                 hist = self.model.fit(self.data_train, self.ground_truth_est, epochs=epochs, shuffle=True, batch_size=self.batch_size, verbose=0)
-                print "loss:", hist.history["loss"][-1]
+                print(("loss:", hist.history["loss"][-1]))
                 self.ground_truth_est = self.model.predict(self.data_train)
 
                 self.pi = self.pi_prior * np.ones((self.num_classes,self.num_classes,self.num_annotators))
-                for r in xrange(self.num_annotators):
+                for r in range(self.num_annotators):
                         normalizer = np.zeros(self.num_classes)
-                        for i in xrange(self.n_train):
-                                for j in xrange(self.seq_length):
+                        for i in range(self.n_train):
+                                for j in range(self.seq_length):
                                         if self.answers[i,j,r] != -1:
                                                 self.pi[:,self.answers[i,j,r],r] += np.transpose(self.ground_truth_est[i,j,:])
                                                 normalizer += self.ground_truth_est[i,j,:]

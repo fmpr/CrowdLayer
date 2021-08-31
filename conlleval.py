@@ -84,4 +84,4 @@ def get_perfo(filename):
 
 if __name__ == '__main__':
     #print get_perf('valid.txt')
-    print(get_perf('valid.txt'))
+    print((get_perf('valid.txt')))
