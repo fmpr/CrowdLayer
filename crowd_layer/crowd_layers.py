@@ -142,7 +142,7 @@ class CrowdsRegression(Layer):
 class MaskedMultiCrossEntropy(object):
 
 	def loss(self, y_true, y_pred):
-		vec = tf.nn.softmax_cross_entropy_with_logits(logits=y_pred, labels=y_true, dim=1)
+		vec = tf.nn.softmax_cross_entropy_with_logits(logits=y_pred, labels=y_true, axis=1)
 		mask = tf.equal(y_true[:,0,:], -1)
 		zer = tf.zeros_like(vec)
 		loss = tf.where(mask, x=zer, y=vec)
@@ -172,7 +172,7 @@ class MaskedMultiSequenceCrossEntropy(object):
 		y_true = tf.transpose(tf.one_hot(tf.cast(y_true, tf.int32), self.num_classes, axis=-1), [0,1,3,2])
 
 		# masked cross-entropy
-		vec = tf.nn.softmax_cross_entropy_with_logits(logits=y_pred, labels=y_true, dim=2)
+		vec = tf.nn.softmax_cross_entropy_with_logits(logits=y_pred, labels=y_true, axis=2)
 		zer = tf.zeros_like(vec)
 		vec = tf.where(mask_missings, x=zer, y=vec)
 		vec = tf.where(mask_padding, x=zer, y=vec)
@@ -358,5 +358,3 @@ class CrowdsAggregationCallback(keras.callbacks.Callback):
 	def on_epoch_end(self, epoch, logs=None):
 		# run M-step
 		self.model.pi = self.loss.m_step()
-
-
